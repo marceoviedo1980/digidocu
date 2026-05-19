@@ -91,6 +91,7 @@ const internadoProcedures = [
 const state = {
   template: "ambulatorio",
   medicines: [],
+  halfCarta: false,
 };
 
 const form = document.querySelector("#recipeForm");
@@ -106,6 +107,8 @@ const admissionServiceSelect = document.querySelector("#admissionServiceSelect")
 const dischargeServiceSelect = document.querySelector("#dischargeServiceSelect");
 const utiAdmissionServiceSelect = document.querySelector("#utiAdmissionServiceSelect");
 const installButton = document.querySelector("#installBtn");
+const halfCartaButton = document.querySelector("#halfCartaBtn");
+const halfCartaButtonLabel = halfCartaButton?.querySelector("span");
 const pdfButton = document.querySelector("#pdfBtn");
 const pdfButtonLabel = pdfButton?.querySelector("span");
 const tabs = [...document.querySelectorAll(".template-tab")];
@@ -148,6 +151,14 @@ tabs.forEach((tab) => {
 
 document.querySelector("#printBtn").addEventListener("click", () => window.print());
 pdfButton.addEventListener("click", generatePdf);
+halfCartaButton.addEventListener("click", () => {
+  state.halfCarta = !state.halfCarta;
+  halfCartaButton.classList.toggle("active", state.halfCarta);
+  if (halfCartaButtonLabel) {
+    halfCartaButtonLabel.textContent = state.halfCarta ? "Plana completa" : "Media carta";
+  }
+  render();
+});
 document.querySelector("#clearBtn").addEventListener("click", () => {
   form.reset();
   state.medicines = [];
@@ -453,12 +464,44 @@ function medicineMeta(medicine) {
   return [medicine.route, medicine.instruction || "Sin indicacion"].filter(Boolean).join(" · ");
 }
 
+function buildRecipeHtml(data) {
+  if (state.template === "internado") return renderInternadoRecipe(data);
+  if (state.template === "utiUcin") return renderUtiUcinRecipe(data);
+  return renderAmbulatorioRecipe(data);
+}
+
 function renderPreview() {
   const data = getData();
-  preview.classList.remove("pdf-preview-page");
+
+  if (state.halfCarta) {
+    // Modo media carta: dos copias en una hoja, con linea de corte entre ellas
+    const templateClass = {
+      ambulatorio: "is-ambulatorio",
+      internado: "is-internado",
+      utiUcin: "is-uti-ucin",
+    }[state.template] || "";
+    const recipeHtml = buildRecipeHtml(data);
+
+    // El article preview pasa a ser el contenedor externo
+    preview.className = "half-carta-outer";
+    preview.innerHTML = `
+      <div class="recipe-page half-carta-copy ${templateClass}">${recipeHtml}</div>
+      <div class="cut-line-row" aria-hidden="true">
+        <span>✂</span>
+        <span class="cut-dashes">─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ CORTAR ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
+        <span>✂</span>
+      </div>
+      <div class="recipe-page half-carta-copy ${templateClass}">${recipeHtml}</div>
+    `;
+    return;
+  }
+
+  // Modo plana completa (comportamiento original)
+  preview.className = "recipe-page";
   preview.classList.toggle("is-ambulatorio", state.template === "ambulatorio");
   preview.classList.toggle("is-internado", state.template === "internado");
   preview.classList.toggle("is-uti-ucin", state.template === "utiUcin");
+
   if (state.template === "internado") {
     preview.innerHTML = renderInternadoRecipe(data);
     return;
