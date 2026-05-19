@@ -486,11 +486,7 @@ function renderPreview() {
     preview.className = "half-carta-outer";
     preview.innerHTML = `
       <div class="recipe-page half-carta-copy ${templateClass}">${recipeHtml}</div>
-      <div class="cut-line-row" aria-hidden="true">
-        <span>✂</span>
-        <span class="cut-dashes">─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ CORTAR ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-        <span>✂</span>
-      </div>
+      <div class="cut-line-col" aria-hidden="true"></div>
       <div class="recipe-page half-carta-copy ${templateClass}">${recipeHtml}</div>
     `;
     return;

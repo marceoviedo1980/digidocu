@@ -1419,63 +1419,66 @@ textarea {
 }
 
 /* ═══════════════════════════════════════════════
-   MODO MEDIA CARTA — Dos copias por hoja carta
-   con linea de corte en el centro
+   MODO MEDIA CARTA — Dos copias lado a lado
+   La hoja se corta verticalmente en el centro
    ═══════════════════════════════════════════════ */
 
 /* Contenedor externo reemplaza al recipe-page */
 .half-carta-outer {
   width: 216mm;
+  height: 279mm;
   margin: 18px auto;
   display: flex;
-  flex-direction: column;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  gap: 0;
+  flex-direction: row;
+  align-items: flex-start;
+  background: #ffffff;
+  border: 1px solid #aeb9b6;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
 }
 
-/* Cada copia = recipe-page escalada al 50% via zoom */
-.half-carta-outer .recipe-page {
-  /* A zoom 0.5, 432mm → 216mm de layout */
-  width: 432mm;
+/* Cada copia = recipe-page a zoom 0.5 → 216mm → 108mm de layout */
+.half-carta-outer .recipe-page.half-carta-copy {
+  width: 216mm;
   min-height: 279mm;
   zoom: 0.5;
+  flex-shrink: 0;
   margin: 0;
+  border: none;
+  box-shadow: none;
   padding: 6mm 7mm 5mm;
-  border: 1px solid #aeb9b6;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
 }
 
-/* Ambulatorio necesita mas padding top — ya incluido en su clase */
-.half-carta-outer .recipe-page.is-ambulatorio {
+.half-carta-outer .recipe-page.half-carta-copy.is-ambulatorio {
   padding-top: 11mm;
 }
 
-/* UTI/UCIN con padding reducido */
-.half-carta-outer .recipe-page.is-uti-ucin {
+.half-carta-outer .recipe-page.half-carta-copy.is-uti-ucin {
   padding: 4.5mm 5mm 3.5mm;
 }
 
-/* Linea punteada de corte entre las dos copias */
-.cut-line-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 9mm;
-  font-size: 12px;
-  color: #666;
-  background: #f4f7f6;
-  border-top: 1.5px dashed #888;
-  border-bottom: 1.5px dashed #888;
-  user-select: none;
+/* Linea de corte vertical en el centro */
+.cut-line-col {
+  flex-shrink: 0;
+  width: 0;
+  align-self: stretch;
+  border-left: 2px dashed #888;
+  position: relative;
 }
 
-.cut-dashes {
-  letter-spacing: 1px;
-  font-size: 11px;
-  color: #888;
+/* Texto "CORTAR" vertical en la linea */
+.cut-line-col::before {
+  content: "✂  CORTAR  ✂";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  white-space: nowrap;
+  font-size: 9px;
+  color: #999;
+  letter-spacing: 2px;
+  background: #ffffff;
+  padding: 0 4px;
 }
 
 /* Indicador visual en el boton cuando esta activo */
@@ -1491,25 +1494,29 @@ textarea {
     width: 216mm;
     height: 279mm;
     margin: 0;
-    gap: 0;
+    border: 0;
+    box-shadow: none;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    overflow: hidden;
   }
 
-  .half-carta-outer .recipe-page {
+  .half-carta-outer .recipe-page.half-carta-copy {
     border: 0 !important;
     box-shadow: none !important;
   }
 
-  .cut-line-row {
-    flex-shrink: 0;
-    height: 6mm;
-    background: transparent;
-    border-top: 1.5px dashed #555;
-    border-bottom: 1.5px dashed #555;
+  .cut-line-col {
+    border-left: 1.5px dashed #444;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    color: #555;
+  }
+
+  .cut-line-col::before {
+    background: transparent;
+    color: #444;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }
 
